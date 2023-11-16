@@ -3,3 +3,9 @@ body{
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+.main{
+    position: absolute;
+    width: 15%;
+    bottom: 0px;
+}
