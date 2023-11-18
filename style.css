@@ -1,11 +1,27 @@
-body{
-    background-image: url("./asset/plaine.jpeg");
-    background-repeat: no-repeat;
-    background-size: cover;
+body {
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: min-content;
+    height: 500px;
+    position: relative;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    background-color: black;
+    overflow-x: hidden;
 }
 
-.main{
+.background {
+    margin: 0;
+    width: max-content;
+    height: 100%;
+    /* position: relative; */
+}
+
+.main {
     position: absolute;
-    width: 15%;
-    bottom: 0px;
+    width: 5%;
+    bottom: 60px;
+    left: 0px;
 }
