@@ -25,12 +25,12 @@ document.addEventListener("keydown", (event) => {
         alert("bas");
     } else if (event.key === "ArrowLeft") {
         direction = "gauche"
-        timerJump = 200
+        timerJump = 150
         renderImage()
         animateDep();
     } else if (event.key === "ArrowRight") {
         direction = "droite"
-        timerJump = 200
+        timerJump = 150
         renderImage();
         animateDep();
     }
