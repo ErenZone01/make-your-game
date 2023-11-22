@@ -12,30 +12,45 @@ var miniJump = 0;
 var actif = true;
 var timeJump;
 var authoJump = true
+var test;
+//bruitage air
+var air = document.createElement("audio")
+air.src = "./fuite-dair.mp3";
 
 document.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowUp") {
-        if (authoJump) {
-            direction = "haut"
-            timerJump = 100
-            renderImage();
-            animateJump();
-        }
-    } else if (event.key === "ArrowDown") {
+    if (event.key === "ArrowDown") {
         alert("bas");
     } else if (event.key === "ArrowLeft") {
-        direction = "gauche"
-        timerJump = 100
-        renderImage()
-        animateDep();
+        eventleft()
     } else if (event.key === "ArrowRight") {
-        direction = "droite"
+        eventright()
+    }else if (event.key === "ArrowUp") {
+        eventJump()
+    }
+});
+
+function eventJump() {
+    if (authoJump) {
+        direction = "haut"
         timerJump = 100
         renderImage();
-        animateDep();
+        animateJump();
     }
+}
 
-});
+function eventleft() {
+    direction = "gauche"
+    timerJump = 100
+    renderImage()
+    animateDep();
+}
+
+function eventright() {
+    direction = "droite"
+    timerJump = 100
+    renderImage();
+    animateDep();
+}
 
 
 function animateJump() {
@@ -55,7 +70,6 @@ function animateJump() {
             actif = true;
         }
     }
-   
     jumpAndScroll()
     // settime = setTimeout(() => {
     if (miniJump != 0) {
@@ -73,31 +87,32 @@ function animateDep() {
     if (deplacement % 10 != 0) {
         if (direction == "droite") {
             if (deplacement < fond.clientWidth - 200) {
-                deplacement += 3,2;
+                deplacement += 3, 2;
             }
         } else if (direction == "gauche") {
             if (deplacement > 0) {
-                deplacement -= 3,2;
+                deplacement -= 3, 2;
             }
         }
         moveAndScroll()
+        clearTimeout(test)
         settime = setTimeout(() => {
             timer = requestAnimationFrame(animateDep)
         }, 100);
     } else {
         if (direction == "droite") {
-            deplacement += 3,2;
+            deplacement += 3, 2;
         } else if (direction == "gauche") {
-            deplacement -= 3,2;
+            deplacement -= 3, 2;
         }
-        setTimeout(() => {     
-            if (miniJump == 0){
+        test = setTimeout(() => {
+            if (miniJump == 0) {
                 let mainImage = document.querySelector(".main");
                 mainImage.setAttribute("src", "./per0.png");
             }
-        }, 100);
+        }, 10);
+        clearTimeout(settime)
         cancelAnimationFrame(timer)
-        clearTimeout()
     }
 }
 //a chaque rechargement de la page ramaner le scroll a 0
@@ -123,19 +138,19 @@ const renderImage = () => {
     // Sélectionner l'image du personnage principal
     let mainImage = document.querySelector(".main");
     // Changer la source de l'image et faire apparaître la nouvelle image
-    if (direction == "droite" || direction == "gauche"){
+    if (direction == "droite" || direction == "gauche") {
         let pos = imageDeplacement[indexFrame++];
         mainImage.setAttribute("src", `./${pos}`);
-    }else if (direction === "haut" && !authoJump) {
+    } else if (direction === "haut" && !authoJump) {
         let pos = imageDeplacement[indexFrame++];
         mainImage.setAttribute("src", `./${pos}`);
         setTimeout(() => {
             mainImage.setAttribute("src", `./atterir.png`);
         }, 1000);
-    }else if (miniJump <= 0){
+    } else if (miniJump <= 0) {
         mainImage.setAttribute("src", "./per0.png");
     }
-    
+
     // Tourner l'image en fonction de la direction
     if (direction === "gauche") {
         mainImage.style.transform = "scaleX(-1)";
@@ -148,7 +163,6 @@ const renderImage = () => {
             if (indexFrame >= imageDeplacement.length) {
                 cancelAnimationFrame(animation);
                 animation = null;
-                clearTimeout(timeout);
             } else {
                 animation = requestAnimationFrame(renderImage);
             }
