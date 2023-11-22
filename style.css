@@ -22,6 +22,7 @@ body {
 .main {
     position: absolute;
     width: 10%;
+    transition: ease-in;
     bottom: 40px;
     left: 0px;
 }
