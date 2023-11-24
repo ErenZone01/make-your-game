@@ -13,9 +13,8 @@ var actif = true;
 var timeJump;
 var authoJump = true
 var test;
+var dep = false;
 //bruitage air
-var air = document.createElement("audio")
-air.src = "./fuite-dair.mp3";
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowDown") {
@@ -24,10 +23,24 @@ document.addEventListener("keydown", (event) => {
         eventleft()
     } else if (event.key === "ArrowRight") {
         eventright()
-    }else if (event.key === "ArrowUp") {
-        eventJump()
+    } else if (event.key === "ArrowUp") {
+        eventJump();
+    } else if (event.key == "x") {
+        attack();
     }
 });
+
+const attack = () => {
+    var air = document.createElement("audio")
+    air.src = "./SF-epee-15.mp3";
+    air.play();
+    direction = "attack"
+    renderImage();
+}
+
+// document.addEventListener("keyup", (event) => {
+//     cancelAnimationFrame(animation)
+// });
 
 function eventJump() {
     if (authoJump) {
@@ -94,6 +107,7 @@ function animateDep() {
                 deplacement -= 3, 2;
             }
         }
+        dep = true
         moveAndScroll()
         clearTimeout(test)
         settime = setTimeout(() => {
@@ -105,12 +119,13 @@ function animateDep() {
         } else if (direction == "gauche") {
             deplacement -= 3, 2;
         }
+        dep = false
         test = setTimeout(() => {
-            if (miniJump == 0) {
+            if ((miniJump == 0) && !dep) {
                 let mainImage = document.querySelector(".main");
                 mainImage.setAttribute("src", "./per0.png");
             }
-        }, 10);
+        }, 30);
         clearTimeout(settime)
         cancelAnimationFrame(timer)
     }
@@ -139,14 +154,31 @@ const renderImage = () => {
     let mainImage = document.querySelector(".main");
     // Changer la source de l'image et faire apparaître la nouvelle image
     if (direction == "droite" || direction == "gauche") {
+        imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
         let pos = imageDeplacement[indexFrame++];
         mainImage.setAttribute("src", `./${pos}`);
     } else if (direction === "haut" && !authoJump) {
+        imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
         let pos = imageDeplacement[indexFrame++];
         mainImage.setAttribute("src", `./${pos}`);
         setTimeout(() => {
             mainImage.setAttribute("src", `./atterir.png`);
         }, 1000);
+    } else if (direction === "attack") {
+        imageDeplacement = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png", "hit06.png"];
+        let pos = imageDeplacement[indexFrame++];
+        mainImage.setAttribute("src", `./${pos}`);
+        if (indexFrame == 5){
+            if (!authoJump){
+                setTimeout(() => {
+                    mainImage.setAttribute("src", `./atterir.png`);
+                }, 400);
+            }else{
+                setTimeout(() => {
+                    mainImage.setAttribute("src", "./per0.png")
+                }, 400);
+            }
+        }
     } else if (miniJump <= 0) {
         mainImage.setAttribute("src", "./per0.png");
     }
@@ -159,13 +191,13 @@ const renderImage = () => {
     }
     // Exécuter les instructions une fois que l'image est chargée
     mainImage.onload = () => {
-        let timeout = setTimeout(() => {
-            if (indexFrame >= imageDeplacement.length) {
-                cancelAnimationFrame(animation);
-                animation = null;
-            } else {
-                animation = requestAnimationFrame(renderImage);
-            }
-        }, timerJump);
+        // let timeout = setTimeout(() => {
+        if (indexFrame >= imageDeplacement.length) {
+            cancelAnimationFrame(animation);
+            animation = null;
+        } else {
+            animation = requestAnimationFrame(renderImage);
+        }
+        // }, 2000);
     };
 };
