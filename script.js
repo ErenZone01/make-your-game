@@ -5,8 +5,10 @@ var settime;
 var direction;
 var fond = document.querySelector(".background");
 var imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
+var imageHit = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png", "hit06.png"];
 var mainImage = document.querySelector(".main");
-let indexFrame = 0;
+let indexFramedep = 0;
+let indexFramehit = 0;
 let timerJump;
 var miniJump = 0;
 var actif = true;
@@ -15,20 +17,48 @@ var authoJump = true
 var test;
 var dep = false;
 //bruitage air
+var keysPressed = {};
 
-document.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowDown") {
+document.addEventListener("keydown", async(event) => {
+    keysPressed[event.key] = true;
+    handleKeyPress();
+});
+
+document.addEventListener("keyup", (event) => {
+    keysPressed[event.key] = false;
+    handleKeyPress();
+});
+
+function handleKeyPress() {
+    if (keysPressed["ArrowDown"]) {
+        // Gérer l'action pour ArrowDown
         alert("bas");
-    } else if (event.key === "ArrowLeft") {
-        eventleft()
-    } else if (event.key === "ArrowRight") {
-        eventright()
-    } else if (event.key === "ArrowUp") {
+    }
+
+    if (keysPressed["ArrowLeft"]) {
+        // Gérer l'action pour ArrowLeft
+        eventleft();
+    }
+
+    if (keysPressed["ArrowRight"]) {
+        // Gérer l'action pour ArrowRight
+        eventright();
+    }
+
+    if (keysPressed["ArrowUp"]) {
+        // Gérer l'action pour ArrowUp
         eventJump();
-    } else if (event.key == "x") {
+    }
+
+    if (keysPressed[" "]) {
+        // Gérer l'action pour la barre d'espace
         attack();
     }
-});
+    setTimeout(() => {
+        requestAnimationFrame(handleKeyPress)
+    }, 5000);
+}
+
 
 const attack = () => {
     var air = document.createElement("audio")
@@ -84,7 +114,7 @@ function animateJump() {
         }
     }
     jumpAndScroll()
-    // settime = setTimeout(() => {
+        // settime = setTimeout(() => {
     if (miniJump != 0) {
         timeJump = requestAnimationFrame(animateJump)
     }
@@ -136,7 +166,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 //deplacement innerhtml et scroll left and right
-const moveAndScroll = () => {
+const moveAndScroll = async() => {
     let perso = document.querySelector(".main");
     perso.style.left = `${deplacement}px`; //changer la position du personnage par rapport a la gauche de l'element parent
     if (deplacement >= 50) { //deplacement: position actuel du personnage, si il est > 50 scroll de 500 NB:j'ai tiré des nombres au hasard
@@ -145,40 +175,42 @@ const moveAndScroll = () => {
     // 
 }
 
-const renderImage = () => {
+const renderImage = async() => {
     // Éviter de dépasser l'index de la taille du tableau d'images
-    if (indexFrame === imageDeplacement.length) {
-        indexFrame = 0;
+    if (indexFramedep === imageDeplacement.length) {
+        indexFramedep = 0;
+    }
+    if (indexFramehit === imageHit.length) {
+        indexFramehit = 0;
     }
     // Sélectionner l'image du personnage principal
     let mainImage = document.querySelector(".main");
     // Changer la source de l'image et faire apparaître la nouvelle image
-    if (direction == "droite" || direction == "gauche") {
+    if (direction === "attack") {
+        let pos = imageHit[indexFramehit++];
+        mainImage.setAttribute("src", `./${pos}`);
+        // if (indexFramehit == 6) {
+        if (!authoJump) {
+            setTimeout(() => {
+                mainImage.setAttribute("src", `./atterir.png`);
+            }, 400);
+        } else {
+            setTimeout(() => {
+                mainImage.setAttribute("src", "./per0.png")
+            }, 400);
+        }
+        // }
+    } else if (direction == "droite" || direction == "gauche") {
         imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
-        let pos = imageDeplacement[indexFrame++];
+        let pos = imageDeplacement[indexFramedep++];
         mainImage.setAttribute("src", `./${pos}`);
     } else if (direction === "haut" && !authoJump) {
         imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
-        let pos = imageDeplacement[indexFrame++];
+        let pos = imageDeplacement[indexFramedep++];
         mainImage.setAttribute("src", `./${pos}`);
         setTimeout(() => {
             mainImage.setAttribute("src", `./atterir.png`);
         }, 1000);
-    } else if (direction === "attack") {
-        imageDeplacement = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png", "hit06.png"];
-        let pos = imageDeplacement[indexFrame++];
-        mainImage.setAttribute("src", `./${pos}`);
-        if (indexFrame == 5){
-            if (!authoJump){
-                setTimeout(() => {
-                    mainImage.setAttribute("src", `./atterir.png`);
-                }, 400);
-            }else{
-                setTimeout(() => {
-                    mainImage.setAttribute("src", "./per0.png")
-                }, 400);
-            }
-        }
     } else if (miniJump <= 0) {
         mainImage.setAttribute("src", "./per0.png");
     }
@@ -192,7 +224,7 @@ const renderImage = () => {
     // Exécuter les instructions une fois que l'image est chargée
     mainImage.onload = () => {
         // let timeout = setTimeout(() => {
-        if (indexFrame >= imageDeplacement.length) {
+        if ((indexFramedep >= imageDeplacement.length) || (indexFramehit >= imageHit.length)) {
             cancelAnimationFrame(animation);
             animation = null;
         } else {
