@@ -1,4 +1,7 @@
-var deplacement = 1;;
+var deplacement = 1;
+var life = 500;
+var lifetitan = 200;
+var degat = 25;
 var animation;
 var timer;
 var settime;
@@ -7,21 +10,130 @@ var fond = document.querySelector(".background");
 var imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
 var imageHit = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png", "hit06.png"];
 var mainImage = document.querySelector(".main");
-let indexFramedep = 0;
-let indexFramehit = 0;
-let timerJump;
+var indexFramedep = 0;
+var indexFramedeptitan = 0;
+var indexFramehit = 1
+var indexFrametitan = 1;
 var miniJump = 0;
 var actif = true;
+var timerJump;
 var timeJump;
+var timehit;
+var timeAnimateTitan;
 var authoJump = true
 var test;
 var dep = false;
-//bruitage air
 var keysPressed = {};
-
+var deplacementTitan = fond.clientWidth - 200;
+var ImageTitan = 8;
+var animateTitan;
+var animatehit;
+var end
+    //create titan
+var titan = document.createElement("img");
+titan.setAttribute("src", "./aot model/pose/titan0.png")
+titan.style.width = "5%";
+titan.style.bottom = "55px"
+titan.style.position = "absolute"
+titan.style.right = "0px"
+document.body.append(titan);
+//create hp barre for titan
+var hpbarre = document.createElement("div");
+hpbarre.classList = "healthbarretitan";
+var hptitan = document.createElement("div");
+hptitan.classList = "healthtitan";
+hptitan.style.width = lifetitan + "%";
+hptitan.id = "healthtitan";
+hpbarre.appendChild(hptitan)
+document.body.append(hpbarre)
+const Endgame = () => {
+    end = requestAnimationFrame(Endgame)
+    if (life <= 0) {
+        alert("Vous avez perdu");
+        clearTimeout(timeAnimateTitan);
+        clearTimeout(timehit);
+        clearTimeout(timerJump);
+        clearTimeout(timer);
+        clearTimeout(test);
+        clearTimeout(settime);
+        cancelAnimationFrame(timeJump);
+        cancelAnimationFrame(animation);
+        cancelAnimationFrame(animatehit);
+        cancelAnimationFrame(animateTitan);
+        cancelAnimationFrame(end);
+    }
+}
+Endgame();
+const hitTitan = () => {
+        let pos = `./aot model/hit/hit${indexFramehit}.png`;
+        titan.setAttribute("src", `${pos}`)
+        indexFramehit++
+        timehit = setTimeout(() => {
+            animatehit = requestAnimationFrame(hitTitan)
+        }, 500);
+        if (indexFramehit == 4) {
+            //setTimeout(() => {
+            if (((deplacementTitan - deplacement >= 0) && (deplacementTitan - deplacement <= 50)) || ((deplacementTitan - deplacement < 0) && (deplacementTitan - deplacement >= -50))) {
+                life -= degat
+                var hp = document.getElementById("health")
+                hp.style.width = life + "%";
+                mainImage = document.querySelector(".main");
+                mainImage.style.bottom = "45px"
+                mainImage.src = "./asset/die.png"
+            }
+            //}, 1000);
+            indexFramehit = 1
+            clearTimeout(timehit)
+            cancelAnimationFrame(animatehit)
+        }
+    }
+    //cretaion de titan
+const renderTitan = () => {
+    if (lifetitan > 0) {
+        if (indexFrametitan > ImageTitan) {
+            indexFrametitan = 1
+        }
+        let pos = `./aot model/depTitan/dep (${indexFrametitan++}).png`;
+        titan.setAttribute("src", `${pos}`)
+        if ((deplacementTitan - deplacement >= 0) && (deplacementTitan - deplacement <= 500)) {
+            titan.style.transform = "scaleX(-1)"
+            if ((deplacementTitan - deplacement >= 0) && (deplacementTitan - deplacement <= 80)) {
+                hitTitan();
+            } else {
+                deplacementTitan -= 10
+            }
+        } else if ((deplacementTitan - deplacement < 0) && (deplacementTitan - deplacement >= -500)) {
+            titan.style.transform = "scaleX(1)"
+            if ((deplacementTitan - deplacement < 0) && (deplacementTitan - deplacement >= -80)) {
+                hitTitan();
+            } else {
+                deplacementTitan += 10
+            }
+        } else {
+            titan.style.transform = "scaleX(-1)"
+            deplacementTitan -= 10
+        }
+        //console.log("titan : " + deplacementTitan + ",main : " + deplacement)
+        titan.style.left = `${deplacementTitan}px`;
+        let height = titan.getBoundingClientRect();
+        hpbarre.style.left = `${deplacementTitan}px`;
+        hpbarre.style.top = `${height.top-20}px`;
+        timeAnimateTitan = setTimeout(() => {
+            animateTitan = requestAnimationFrame(renderTitan)
+        }, 450);
+        if (deplacementTitan <= 0) {
+            clearTimeout(timeAnimateTitan)
+            cancelAnimationFrame(animateTitan)
+            alert("Tu as perdu")
+        }
+    }
+}
+renderTitan()
 document.addEventListener("keydown", async(event) => {
-    keysPressed[event.key] = true;
-    handleKeyPress();
+    if (life > 0) {
+        keysPressed[event.key] = true;
+        handleKeyPress();
+    }
 });
 
 document.addEventListener("keyup", (event) => {
@@ -32,7 +144,6 @@ document.addEventListener("keyup", (event) => {
 function handleKeyPress() {
     if (keysPressed["ArrowDown"]) {
         // Gérer l'action pour ArrowDown
-        alert("bas");
     }
 
     if (keysPressed["ArrowLeft"]) {
@@ -56,9 +167,8 @@ function handleKeyPress() {
     }
     setTimeout(() => {
         requestAnimationFrame(handleKeyPress)
-    }, 5000);
+    }, 2000);
 }
-
 
 const attack = () => {
     var air = document.createElement("audio")
@@ -66,11 +176,20 @@ const attack = () => {
     air.play();
     direction = "attack"
     renderImage();
-}
+    if (((deplacementTitan - deplacement >= 0) && (deplacementTitan - deplacement <= 30)) || ((deplacementTitan - deplacement < 0) && (deplacementTitan - deplacement >= -30))) {
+        lifetitan -= degat
+        let hp = document.getElementById("healthtitan");
+        hp.style.width = lifetitan + "%";
+        if (lifetitan <= 0) {
+            //si le titan n'a plus de vie
+            titan.style.display = "none"
+            titan.style.visibility = "none"
+            hpbarre.style.display = "none"
+            hpbarre.style.visibility = "none"
 
-// document.addEventListener("keyup", (event) => {
-//     cancelAnimationFrame(animation)
-// });
+        }
+    }
+}
 
 function eventJump() {
     if (authoJump) {
@@ -94,7 +213,6 @@ function eventright() {
     renderImage();
     animateDep();
 }
-
 
 function animateJump() {
     if (actif) {
@@ -123,7 +241,7 @@ function animateJump() {
 //deplacement innerhtml et scroll top and bottom
 const jumpAndScroll = () => {
     let perso = document.querySelector(".main");
-    perso.style.bottom = `${40 + miniJump}px`; //changer la position du personnage par rapport a la gauche de l'element parent
+    perso.style.bottom = `${45 + miniJump}px`; //changer la position du personnage par rapport a la gauche de l'element parent
 }
 
 function animateDep() {
@@ -180,16 +298,16 @@ const renderImage = async() => {
     if (indexFramedep === imageDeplacement.length) {
         indexFramedep = 0;
     }
-    if (indexFramehit === imageHit.length) {
-        indexFramehit = 0;
+    if (indexFramedeptitan === imageHit.length) {
+        indexFramedeptitan = 0;
     }
     // Sélectionner l'image du personnage principal
     let mainImage = document.querySelector(".main");
     // Changer la source de l'image et faire apparaître la nouvelle image
     if (direction === "attack") {
-        let pos = imageHit[indexFramehit++];
+        let pos = imageHit[indexFramedeptitan++];
         mainImage.setAttribute("src", `./${pos}`);
-        // if (indexFramehit == 6) {
+        // if (indexFramedeptitan == 6) {
         if (!authoJump) {
             setTimeout(() => {
                 mainImage.setAttribute("src", `./atterir.png`);
@@ -201,11 +319,9 @@ const renderImage = async() => {
         }
         // }
     } else if (direction == "droite" || direction == "gauche") {
-        imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
         let pos = imageDeplacement[indexFramedep++];
         mainImage.setAttribute("src", `./${pos}`);
     } else if (direction === "haut" && !authoJump) {
-        imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
         let pos = imageDeplacement[indexFramedep++];
         mainImage.setAttribute("src", `./${pos}`);
         setTimeout(() => {
@@ -224,7 +340,7 @@ const renderImage = async() => {
     // Exécuter les instructions une fois que l'image est chargée
     mainImage.onload = () => {
         // let timeout = setTimeout(() => {
-        if ((indexFramedep >= imageDeplacement.length) || (indexFramehit >= imageHit.length)) {
+        if ((indexFramedep >= imageDeplacement.length) || (indexFramedeptitan >= imageHit.length)) {
             cancelAnimationFrame(animation);
             animation = null;
         } else {

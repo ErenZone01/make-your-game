@@ -23,6 +23,49 @@ body {
     position: absolute;
     width: 8%;
     transition: ease-in;
-    bottom: 40px;
+    bottom: 45px;
     left: 0px;
+}
+
+.healthbarre {
+    width: 180px;
+    height: 10px;
+    background-color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin-left: 30px;
+    border-style: solid;
+    /* border-radius: 10%; */
+    overflow: hidden;
+}
+
+.healthbarretitan {
+    width: 120px;
+    height: 7px;
+    background-color: white;
+    position: absolute;
+    right: 0;
+    border-style: solid;
+    /* border-radius: 10%; */
+    overflow: hidden;
+}
+
+.hp {
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.health {
+    height: 100%;
+    background-color: chartreuse;
+    transition: width 0.3 ease-in-out;
+}
+
+.healthtitan {
+    height: 100%;
+    background-color: red;
+    transition: width 0.3 ease-in-out;
 }
