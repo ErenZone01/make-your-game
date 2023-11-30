@@ -340,6 +340,30 @@ const moveAndScroll = async() => {
     }
     // 
 }
+var indexblood = 1;
+var animateblood;
+var timeblood;
+const blood = () => {
+    if (indexblood > 7) {
+        indexblood = 1;
+        clearTimeout(timeblood);
+        cancelAnimationFrame(animateblood);
+    } else {
+        let mainImage = document.querySelector(".main");
+        let info = mainImage.getBoundingClientRect();
+        let bloods = document.createElement("img");
+        bloods.style.position = "absolute";
+        bloods.style.left = `${deplacement+10}px`;
+        bloods.style.bottom = info.bottom + "px"
+        bloods.style.width = `2%`;
+        bloods.setAttribute("src", `./aot model/blood/blood (${indexblood++}).png`);
+        document.body.append(bloods);
+        timeblood = setTimeout(() => {
+            animateblood = requestAnimationFrame(blood)
+        }, 10);
+    }
+}
+
 
 const renderImage = async() => {
     // Éviter de dépasser l'index de la taille du tableau d'images
