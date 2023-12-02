@@ -1,6 +1,7 @@
 var deplacement = 1;
 var life = 100;
 var degat = 2;
+var point = 0
 var animation;
 var timer;
 var settime;
@@ -28,16 +29,66 @@ var timeblood;
 //name titan
 var nameTitan = ["titan", "cuirasse"];
 //nbr titan
-let numberOfTitans = 3;
+let numberOfTitans = 4;
 const titans = [];
 let createTitantimer = null;
 //Creer un timer
 let duration = null;
 let heure = 120;
+var backgroundsound;
+//creation de sang
+let bloods = document.createElement("img");
+bloods.style.position = "absolute";
+bloods.style.left = `0px`;
+bloods.style.bottom = "45px";
+bloods.id = "sang";
+bloods.style.visibility = "hidden";
+bloods.style.width = `5%`;
+bloods.setAttribute("src", `./aot model/blood/blood${indexblood++}.png`);
+document.body.append(bloods);
+//initialisation des points
+let pointdiv = document.getElementById("point")
+pointdiv.textContent = point;
+
+const BackgroundSound = () => {
+    backgroundsound = document.createElement("audio")
+    backgroundsound.src = "./background.mp3";
+    backgroundsound.loop = true;
+    backgroundsound.play();
+}
+BackgroundSound();
+
+const Endgame = async () => {
+    if (((life <= 0) || (heure <= 0)) || ((heure < 110) && (titans.length == 0))) {
+        for (let i = 0; i < titans.length; i++) {
+            clearTimeout(await titans[i].timeAnimateTitan);
+            clearTimeout(await titans[i].timehit);
+            clearTimeout(timerJump);
+            clearTimeout(duration);
+            clearTimeout(timer);
+            clearTimeout(test);
+            clearTimeout(settime);
+            cancelAnimationFrame(timeJump);
+            cancelAnimationFrame(animation);
+            cancelAnimationFrame(await titans[i].animatehit);
+            cancelAnimationFrame(await titans[i].animateTitan);
+            cancelAnimationFrame(end);
+        }
+        if ((heure < 110) && (titans.length == 0)) {
+            alert("Vous avez Gagner");
+        } else {
+            alert("Vous avez Perdu");
+        }
+
+    } else {
+        end = requestAnimationFrame(Endgame)
+    }
+}
+
 const GameDuration = () => {
     let timerid = document.getElementById("heure")
     timerid.textContent = heure
-    if (heure == 0) {
+    if ((heure == 0) || ((heure < 110) && (titans.length == 0))) {
         clearTimeout(duration)
         Endgame();
     } else {
@@ -70,11 +121,18 @@ class Titan {
         this.animateflash = null;
         this.height = null;
         this.animationtitan = 450;
+        this.position = "";
+        //poussiere
+        this.indexpoussiere = 1;
+        this.animatepoussiere = null;
+        this.timepoussiere = null;
         //les methodes
         this.createTitan();
         this.flash();
         this.createHPBar();
+        this.createpoussiere();
         this.renderTitan();
+
     }
     //apparition titan
     flash = () => {
@@ -89,11 +147,17 @@ class Titan {
             flashs.style.visibility = "hidden";
             flashs.id = "flash";
             document.body.append(flashs)
+            var thunder = document.createElement("audio")
+            thunder.src = "./thunder.mp3";
+            thunder.play();
         }
         let div = document.getElementById("flash");
         div.style.visibility = "visible";
         div.src = `./aot model/apparition/flash${this.indexflash++}.png`;
         if (this.indexflash == 7) {
+            var beast = document.createElement("audio")
+            beast.src = "./awake.mp3";
+            beast.play();
             clearTimeout(this.timeflash);
             cancelAnimationFrame(this.animateflash);
             div.style.visibility = "hidden";
@@ -138,6 +202,19 @@ class Titan {
         document.body.append(this.hpbarre);
     }
 
+    createpoussiere() {
+        //creation poussiere
+        let bloods = document.createElement("img");
+        bloods.style.position = "absolute";
+        bloods.style.left = `0px`;
+        bloods.style.bottom = "45px";
+        bloods.id = `poussiere${this.id}`;
+        bloods.style.visibility = "hidden";
+        bloods.style.width = `5%`;
+        bloods.setAttribute("src", `./aot model/poussiere/poussiere${this.indexpoussiere++}.png`);
+        document.body.append(bloods);
+    }
+
     hitTitan() {
         this.animationtitan = 450;
         let pre = document.getElementById(`${this.id}`);
@@ -146,6 +223,7 @@ class Titan {
         pre.style.width = "5%";
         let pos;
         let nbrimage;
+
         if (this.name == nameTitan[0]) {
             pos = `./aot model/hit/hit${this.indexFramehit++}.png`;
             this.titan.setAttribute("src", `${pos}`);
@@ -155,8 +233,6 @@ class Titan {
             this.titan.setAttribute("src", `${pos}`);
             nbrimage = 4;
         }
-
-
         // Logique pour gérer les attaques du titan
         // ...
         //this.indexFramehit++;
@@ -167,6 +243,13 @@ class Titan {
         if (this.indexFramehit === nbrimage) {
             // Logique après l'animation d'attaque du titan
             // ...
+            //bruit de frappe sur le sol
+            var hit = document.createElement("audio")
+            hit.src = "./rock.mp3";
+            hit.currentTime = 2;
+            hit.volume = 0.5;
+            hit.play();
+
             if (((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 50)) || ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -50))) {
                 life -= this.degatTitan
                 var hpmain = document.getElementById("health");
@@ -186,6 +269,25 @@ class Titan {
         }
     }
 
+    animatepoussierefunc() {
+        let poussiere = document.getElementById(`poussiere${this.id}`);
+        if (this.indexpoussiere > 12) {
+            this.indexpoussiere = 1;
+            poussiere.style.visibility = "hidden";
+            cancelAnimationFrame(this.animatepoussiere)
+        } else {
+            poussiere.src = `./aot model/poussiere/poussiere${this.indexpoussiere++}.png`;
+            poussiere.style.visibility = "visible";
+            poussiere.style.transform = this.position;
+            if (this.position == "scaleX(-1)") {
+                poussiere.style.left = `${this.deplacementTitan + this.tailles}px`
+            } else {
+                poussiere.style.left = `${this.deplacementTitan}px`
+            }
+            this.animatepoussiere = requestAnimationFrame(() => this.animatepoussierefunc());
+        }
+    }
+
     renderTitan() {
         if (this.lifetitan > 0) {
             if (this.indexFrametitan > ImageTitan) {
@@ -201,7 +303,7 @@ class Titan {
                     pos = `./aot model/depTitan/cuirasseRun${this.indexFrametitan++}.png`;
                     let pre = document.getElementById(`${this.id}`);
                     pre.style.height = "400px";
-                    pre.style.bottom = "-20px";
+                    pre.style.bottom = "-30px";
                     pre.style.width = "10%";
                     actif = true;
                 } else {
@@ -211,13 +313,14 @@ class Titan {
                     pre.style.bottom = "55px";
                     pre.style.width = "5%";
                 }
-                    this.titan.setAttribute("src", `${pos}`);
+                this.titan.setAttribute("src", `${pos}`);
             }
 
             // Logique pour animer le mouvement du titan
             // ...
             if ((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 500)) {
                 this.titan.style.transform = "scaleX(-1)"
+                this.position = "scaleX(-1)"
                 if ((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 50)) {
                     this.hitTitan();
                 } else {
@@ -225,6 +328,7 @@ class Titan {
                     if (actif) {
                         this.deplacementTitan -= 15;
                         this.animationtitan = 150;
+                        this.animatepoussierefunc();
                         actif = false
                     } else {
                         this.animationtitan = 450;
@@ -233,6 +337,7 @@ class Titan {
                 }
             } else if ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -500)) {
                 this.titan.style.transform = "scaleX(1)"
+                this.position = "scaleX(1)"
                 if ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -50)) {
                     this.hitTitan();
                 } else {
@@ -240,6 +345,7 @@ class Titan {
                     if (actif) {
                         this.deplacementTitan += 15;
                         this.animationtitan = 150;
+                        this.animatepoussierefunc();
                         actif = false
                     } else {
                         this.animationtitan = 450;
@@ -295,31 +401,9 @@ const creationtitan = () => {
 creationtitan();
 //}
 //FIN DE JEU
-const Endgame = async () => {
-    if ((life <= 0) || (heure <= 0)) {
-        alert("Vous avez perdu");
-        for (let i = 0; i < titans.length; i++) {
-            clearTimeout(await titans[i].timeAnimateTitan);
-            clearTimeout(await titans[i].timehit);
-            clearTimeout(timerJump);
-            clearTimeout(duration);
-            clearTimeout(timer);
-            clearTimeout(test);
-            clearTimeout(settime);
-            cancelAnimationFrame(timeJump);
-            cancelAnimationFrame(animation);
-            cancelAnimationFrame(await titans[i].animatehit);
-            cancelAnimationFrame(await titans[i].animateTitan);
-            cancelAnimationFrame(end);
-        }
-    } else {
-        end = requestAnimationFrame(Endgame)
-    }
-}
-Endgame();
 
 document.addEventListener("keydown", async (event) => {
-    if ((life > 0) && (heure > 0)) {
+    if ((life > 0) && (heure > 0) && (titans.length != 0)) {
         keysPressed[event.key] = true;
         handleKeyPress();
     }
@@ -362,13 +446,14 @@ function handleKeyPress() {
 }
 var authoattack = true
 const attack = () => {
-    if (authoattack){
+    if (authoattack) {
         authoattack = false
         // setTimeout(() => {
-            authoattack = true
+        authoattack = true
         // }, 200);
         var air = document.createElement("audio")
         air.src = "./SF-epee-15.mp3";
+        air.volume = 0.2;
         air.play();
         direction = "attack"
         renderImage();
@@ -476,26 +561,32 @@ const moveAndScroll = async () => {
     }
     // 
 }
+
 const blood = () => {
-    if (indexblood > 7) {
+    if (indexblood > 6) {
         indexblood = 1;
+        bloods.style.visibility = "hidden";
         clearTimeout(timeblood);
         cancelAnimationFrame(animateblood);
     } else {
         let mainImage = document.querySelector(".main");
         let info = mainImage.getBoundingClientRect();
-        let bloods = document.createElement("img");
-        bloods.style.position = "absolute";
-        bloods.style.left = `${deplacement + 10}px`;
+        let bloods = document.getElementById("sang");
+        bloods.style.visibility = "visible"
+        if (direction === "gauche") {
+            bloods.style.transform = "scaleX(-1)";
+        } else if (direction === "droite") {
+            bloods.style.transform = "scaleX(1)";
+        }
+        bloods.style.left = `${deplacement + 30}px`;
         bloods.style.bottom = info.bottom + "px";
-        bloods.style.width = `2%`;
-        bloods.setAttribute("src", `./aot model/blood/blood (${indexblood++}).png`);
-        document.body.append(bloods);
+        bloods.setAttribute("src", `./aot model/blood/blood${indexblood++}.png`);
         timeblood = setTimeout(() => {
             animateblood = requestAnimationFrame(blood)
-        }, 10);
+        }, 100);
     }
 }
+
 const renderImage = async () => {
     // Éviter de dépasser l'index de la taille du tableau d'images
     if (indexFramedep === imageDeplacement.length) {
@@ -521,15 +612,31 @@ const renderImage = async () => {
                 let hauteur = maininf.top;
                 if (((titan.deplacementTitan - deplacement >= 0) && (titan.deplacementTitan - deplacement <= taille) && ((hauteur >= height - 30) && (hauteur <= height + 30))) || ((titan.deplacementTitan - deplacement < 0) && (titan.deplacementTitan - deplacement >= -taille) && ((hauteur >= height - 30) && (hauteur <= height + 30)))) {
                     titan.lifetitan -= degat;
-                    //blood();
+                    blood();
                     let hp = document.getElementById("health" + titan.id);
                     hp.style.width = titan.lifetitan + "%";
                     if (titan.lifetitan <= 0) {
+                        if (titan.name == nameTitan[0]){
+                            point += 10;
+                        }else if (titan.name == nameTitan[1]){
+                            point += 15;
+                        }
+                        let pointdiv = document.getElementById("point")
+                        pointdiv.textContent = point + "+";
+                        pointdiv.style.color = "yellow";
+                        pointdiv.style.fontSize = "200%"
+                        setTimeout(() => {
+                            pointdiv.textContent = point;
+                            pointdiv.style.color = "white";
+                            pointdiv.style.fontSize = "100%"
+                        }, 500);
                         //si le titan n'a plus de vie
                         titan.titan.style.display = "none";
                         titan.titan.style.visibility = "none";
                         titan.hpbarre.style.display = "none";
                         titan.hpbarre.style.visibility = "none";
+                        titans.splice(i, 1)
+                        console.log("taille : " + titans.length)
                     }
                 }
             }
@@ -572,7 +679,7 @@ const renderImage = async () => {
         animation = null;
     } else {
         // setTimeout(() => {
-            animation = requestAnimationFrame(renderImage);
+        animation = requestAnimationFrame(renderImage);
         // }, 100);
     }
     //  }, 2000);

@@ -33,11 +33,22 @@ body {
     background-color: white;
     position: fixed;
     left: 0;
-    top: 0;
-    margin-left: 30px;
+    top: 8px;
+    margin-left: 60px;
     border-style: solid;
     /* border-radius: 10%; */
     overflow: hidden;
+}
+
+.points{
+    position: fixed;
+    left: 0px;
+    top : 40px;
+    font-weight: bolder;
+    color: white;
+}
+.point{
+    font-size: 160%;
 }
 
 .healthbarretitan {
@@ -54,6 +65,7 @@ body {
 .hp {
     color: white;
     position: fixed;
+    font-size: 160%;
     left: 0;
     top: 0;
 }
@@ -78,9 +90,13 @@ body {
 
 .time {
     margin-left: 45%;
+    width: max-content;
     font-weight: bolder;
     font-size: 180%;
     color: black;
+    padding: 10px;
+    border-style:groove;
+    border-color: white;
 }
 
 #heure {
