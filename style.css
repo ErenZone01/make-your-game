@@ -69,3 +69,21 @@ body {
     background-color: red;
     transition: width 0.1 ease-in-out;
 }
+
+#timer {
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+.time {
+    margin-left: 45%;
+    font-weight: bolder;
+    font-size: 180%;
+    color: black;
+}
+
+#heure {
+    font-size: 180%;
+    color: white;
+}

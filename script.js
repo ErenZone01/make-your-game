@@ -27,26 +27,81 @@ var animateblood;
 var timeblood;
 //name titan
 var nameTitan = ["titan", "cuirasse"];
+//nbr titan
+let numberOfTitans = 5;
+const titans = [];
+let createTitantimer = null;
+//Creer un timer
+let duration = null;
+let heure = 120;
+const GameDuration = () => {
+    let timerid = document.getElementById("heure")
+    timerid.textContent = heure
+    if (heure == 0) {
+        clearTimeout(duration)
+        Endgame();
+    } else {
+        duration = setTimeout(() => {
+            heure--;
+            GameDuration();
+        }, 1000);
+    }
+}
+GameDuration();
 
 class Titan {
     constructor(id, name) {
-        this.id = id;
-        this.deplacementTitan = fond.clientWidth - 200;
-        this.lifetitan = 100;
-        this.degatTitan = 5;
-        this.indexFrametitan = 1;
-        this.indexFramehit = 1;
-        this.animateTitan = null;
-        this.hpbarre = null;
-        this.hp = null;
-        this.tailles = null;
-        this.animatehit = null;
-        this.timehit = null;
-        this.timeAnimateTitan = null;
-        this.name = name
-        this.createTitan();
-        this.createHPBar();
-        this.renderTitan();
+            this.id = id;
+            this.deplacementTitan = fond.clientWidth - 200;
+            this.lifetitan = 100;
+            this.degatTitan = 1;
+            this.indexFrametitan = 1;
+            this.indexFramehit = 1;
+            this.animateTitan = null;
+            this.hpbarre = null;
+            this.hp = null;
+            this.tailles = null;
+            this.animatehit = null;
+            this.timehit = null;
+            this.timeAnimateTitan = null;
+            this.name = name
+            this.indexflash = 1;
+            this.timeflash = null;
+            this.animateflash = null;
+            this.height = null;
+            //les methodes
+            this.createTitan();
+            this.flash();
+            this.createHPBar();
+            this.renderTitan();
+        }
+        //apparition titan
+    flash = () => {
+        if (this.indexflash == 1) {
+            let flashs = document.createElement("img");
+            flashs.setAttribute("src", `./aot model/apparition/flash${1}.png`);
+            flashs.style.position = "absolute";
+            flashs.style.width = "2%";
+            flashs.style.height = "100%";
+            flashs.style.left = `${this.deplacementTitan}px`;
+            flashs.style.bottom = `45px`;
+            flashs.style.visibility = "hidden";
+            flashs.id = "flash";
+            document.body.append(flashs)
+        }
+        let div = document.getElementById("flash");
+        div.style.visibility = "visible";
+        div.src = `./aot model/apparition/flash${this.indexflash++}.png`;
+        if (this.indexflash == 7) {
+            clearTimeout(this.timeflash);
+            cancelAnimationFrame(this.animateflash);
+            div.style.visibility = "hidden";
+            this.indexflash = 1;
+        } else {
+            this.timeflash = setTimeout(() => {
+                this.animateflash = requestAnimationFrame(() => this.flash())
+            }, 500);
+        }
     }
 
     createTitan() {
@@ -57,6 +112,7 @@ class Titan {
             this.titan.setAttribute("src", `./aot model/pose/${nameTitan[1]}1.png`);
         }
         this.titan.style.width = "5%";
+        this.titan.style.height = "300px";
         this.titan.style.bottom = "55px";
         this.titan.style.position = "absolute";
         this.titan.style.right = `0px`;
@@ -66,6 +122,7 @@ class Titan {
         let test = document.getElementById(this.id);
         let info = test.getBoundingClientRect();
         this.tailles = info.width;
+        this.height = info.top;
     }
 
     createHPBar() {
@@ -115,7 +172,7 @@ class Titan {
                 }
                 mainImage = document.querySelector(".main");
                 mainImage.style.bottom = "45px"
-                //mainImage.src = "./asset/die.png"
+                    //mainImage.src = "./asset/die.png"
             }
             this.indexFramehit = 1;
             clearTimeout(this.timehit);
@@ -173,30 +230,7 @@ class Titan {
     }
 }
 
-let numberOfTitans = 5;
-const titans = [];
-var indexflash = 1;
-var timeflash = null;
-var animateflash = null;
-//apparition titan
-const flash=()=> {
-    var flash = document.createElement("img")
-    flash.setAttribute("src", `./aot model/apparition/flash${indexflash++}.png`)
-    flash.id="flash"
-    timeflash= setTimeout(() => {
-        animateflash = requestAnimationFrame(flash)
-    }, 500);
-    if (indexflash == 7){
-        var flash = document.getElementById("flash")
-        document.body.removeChild("flash")
-        clearTimeout(timeflash);
-        cancelAnimationFrame(animateflash);
-        indexflash=1;
-    }
-}
-
-// Créer le premier titan (le joueur)
-let createTitantimer = null;
+// Créer les titan
 const creationtitan = () => {
     if (numberOfTitans == 0) {
         clearTimeout(createTitantimer)
@@ -205,10 +239,8 @@ const creationtitan = () => {
         let titan;
         if (numberOfTitans % 2 == 0) {
             titan = new Titan(numberOfTitans, nameTitan[1]);
-            flash();
         } else {
             titan = new Titan(numberOfTitans, nameTitan[0]);
-            flash();
         }
         titan.deplacementTitan -= 100 * numberOfTitans
         titans.push(titan);
@@ -220,13 +252,14 @@ const creationtitan = () => {
 creationtitan();
 //}
 //FIN DE JEU
-const Endgame = async () => {
-    if (life <= 0) {
+const Endgame = async() => {
+    if ((life <= 0) || (heure <= 0)) {
         alert("Vous avez perdu");
         for (let i = 0; i < titans.length; i++) {
             clearTimeout(await titans[i].timeAnimateTitan);
             clearTimeout(await titans[i].timehit);
             clearTimeout(timerJump);
+            clearTimeout(duration);
             clearTimeout(timer);
             clearTimeout(test);
             clearTimeout(settime);
@@ -242,8 +275,8 @@ const Endgame = async () => {
 }
 Endgame();
 
-document.addEventListener("keydown", async (event) => {
-    if (life > 0) {
+document.addEventListener("keydown", async(event) => {
+    if ((life > 0) && (heure > 0)) {
         keysPressed[event.key] = true;
         handleKeyPress();
     }
@@ -334,7 +367,7 @@ function animateJump() {
         }
     }
     jumpAndScroll()
-    // settime = setTimeout(() => {
+        // settime = setTimeout(() => {
     if (miniJump != 0) {
         timeJump = requestAnimationFrame(animateJump)
     }
@@ -386,7 +419,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 //deplacement innerhtml et scroll left and right
-const moveAndScroll = async () => {
+const moveAndScroll = async() => {
     let perso = document.querySelector(".main");
     perso.style.left = `${deplacement}px`; //changer la position du personnage par rapport a la gauche de l'element parent
     if (deplacement >= 50) { //deplacement: position actuel du personnage, si il est > 50 scroll de 500 NB:j'ai tiré des nombres au hasard
@@ -414,7 +447,7 @@ const blood = () => {
         }, 10);
     }
 }
-const renderImage = async () => {
+const renderImage = async() => {
     // Éviter de dépasser l'index de la taille du tableau d'images
     if (indexFramedep === imageDeplacement.length) {
         indexFramedep = 0;
@@ -435,17 +468,23 @@ const renderImage = async () => {
             for (let i = 0; i < titans.length; i++) {
                 let titan = titans[i];
                 let taille = titan.tailles;
-                if (((titan.deplacementTitan - deplacement >= 0) && (titan.deplacementTitan - deplacement <= taille)) || ((titan.deplacementTitan - deplacement < 0) && (titan.deplacementTitan - deplacement >= -taille))) {
+                let height = titan.height;
+                console.log("hauteur : " + height);
+                mainImage = document.querySelector(".main");
+                let maininf = mainImage.getBoundingClientRect();
+                let hauteur = maininf.top;
+                console.log("main : " + hauteur);
+                if (((titan.deplacementTitan - deplacement >= 0) && (titan.deplacementTitan - deplacement <= taille) && ((hauteur >= height) && (hauteur <= height))) || ((titan.deplacementTitan - deplacement < 0) && (titan.deplacementTitan - deplacement >= -taille) && (hauteur == height))) {
                     titan.lifetitan -= degat;
                     //blood();
                     let hp = document.getElementById("health" + titan.id);
                     hp.style.width = titan.lifetitan + "%";
                     if (titan.lifetitan <= 0) {
                         //si le titan n'a plus de vie
-                        titan.titan.style.display = "none"
-                        titan.titan.style.visibility = "none"
-                        titan.hpbarre.style.display = "none"
-                        titan.hpbarre.style.visibility = "none"
+                        titan.titan.style.display = "none";
+                        titan.titan.style.visibility = "none";
+                        titan.hpbarre.style.display = "none";
+                        titan.hpbarre.style.visibility = "none";
                     }
                 }
             }
