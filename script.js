@@ -58,7 +58,7 @@ const BackgroundSound = () => {
 }
 BackgroundSound();
 
-const Endgame = async () => {
+const Endgame = async() => {
     if (((life <= 0) || (heure <= 0)) || ((heure < 110) && (titans.length == 0))) {
         for (let i = 0; i < titans.length; i++) {
             clearTimeout(await titans[i].timeAnimateTitan);
@@ -102,39 +102,44 @@ GameDuration();
 
 class Titan {
     constructor(id, name) {
-        this.id = id;
-        this.deplacementTitan = fond.clientWidth - 200;
-        this.lifetitan = 100;
-        this.degatTitan = 1;
-        this.indexFrametitan = 1;
-        this.indexFramehit = 1;
-        this.animateTitan = null;
-        this.hpbarre = null;
-        this.hp = null;
-        this.tailles = null;
-        this.animatehit = null;
-        this.timehit = null;
-        this.timeAnimateTitan = null;
-        this.name = name
-        this.indexflash = 1;
-        this.timeflash = null;
-        this.animateflash = null;
-        this.height = null;
-        this.animationtitan = 450;
-        this.position = "";
-        //poussiere
-        this.indexpoussiere = 1;
-        this.animatepoussiere = null;
-        this.timepoussiere = null;
-        //les methodes
-        this.createTitan();
-        this.flash();
-        this.createHPBar();
-        this.createpoussiere();
-        this.renderTitan();
+            this.id = id;
+            this.deplacementTitan = fond.clientWidth - 200;
+            this.lifetitan = 100;
+            this.degatTitan = 1;
+            this.indexFrametitan = 1;
+            this.indexFramehit = 1;
+            this.animateTitan = null;
+            this.hpbarre = null;
+            this.hp = null;
+            this.tailles = null;
+            this.animatehit = null;
+            this.timehit = null;
+            this.timeAnimateTitan = null;
+            this.name = name
+            this.indexflash = 1;
+            this.timeflash = null;
+            this.animateflash = null;
+            this.height = null;
+            this.animationtitan = 450;
+            this.position = "";
+            //poussiere
+            this.indexpoussiere = 1;
+            this.animatepoussiere = null;
+            this.timepoussiere = null;
+            //impact
+            this.indeximpact = 1;
+            this.animateimpactframe = null;
+            this.timeimpact = null;
+            //les methodes
+            this.createTitan();
+            this.flash();
+            this.createHPBar();
+            this.createimpact();
+            this.createpoussiere();
+            this.renderTitan();
 
-    }
-    //apparition titan
+        }
+        //apparition titan
     flash = () => {
         if (this.indexflash == 1) {
             let flashs = document.createElement("img");
@@ -214,6 +219,18 @@ class Titan {
         bloods.setAttribute("src", `./aot model/poussiere/poussiere${this.indexpoussiere++}.png`);
         document.body.append(bloods);
     }
+    createimpact() {
+        //creation poussiere
+        let impact = document.createElement("img");
+        impact.style.position = "absolute";
+        impact.style.left = `0px`;
+        impact.style.bottom = "45px";
+        impact.id = `impact${this.id}`;
+        impact.style.visibility = "hidden";
+        impact.style.width = `5%`;
+        impact.setAttribute("src", `./aot model/impact/impact (${this.indeximpact++}).png`);
+        document.body.append(impact);
+    }
 
     hitTitan() {
         this.animationtitan = 450;
@@ -249,6 +266,8 @@ class Titan {
             hit.currentTime = 2;
             hit.volume = 0.5;
             hit.play();
+            //faire l'impact
+            this.animateimpact();
 
             if (((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 50)) || ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -50))) {
                 life -= this.degatTitan
@@ -261,7 +280,7 @@ class Titan {
                 }
                 mainImage = document.querySelector(".main");
                 mainImage.style.bottom = "45px"
-                //mainImage.src = "./asset/die.png"
+                    //mainImage.src = "./asset/die.png"
             }
             this.indexFramehit = 1;
             clearTimeout(this.timehit);
@@ -288,6 +307,28 @@ class Titan {
         }
     }
 
+    animateimpact() {
+        let impact = document.getElementById(`impact${this.id}`);
+        if (this.indeximpact > 10) {
+            this.indeximpact = 1;
+            impact.style.visibility = "hidden";
+            clearTimeout(this.timeimpact);
+            cancelAnimationFrame(this.animateimpactframe);
+        } else {
+            impact.src = `./aot model/impact/impact (${this.indeximpact++}).png`;
+            impact.style.visibility = "visible";
+            impact.style.transform = this.position;
+            // if (this.position == "scaleX(-1)") {
+            //     impact.style.left = `${this.deplacementTitan + this.tailles}px`
+            // } else {
+            impact.style.left = `${this.deplacementTitan}px`;
+            //}
+            this.timeimpact = setTimeout(() => {
+                this.animateimpactframe = requestAnimationFrame(() => this.animateimpact());
+            }, 500);;
+        }
+    }
+
     renderTitan() {
         if (this.lifetitan > 0) {
             if (this.indexFrametitan > ImageTitan) {
@@ -296,22 +337,26 @@ class Titan {
             let pos;
             let actif = false
             if (this.name == nameTitan[0]) {
+                let pre = document.getElementById(`${this.id}`);
+                pre.style.height = "280px";
+                pre.style.bottom = "55px";
+                pre.style.width = "5%";
                 pos = `./aot model/depTitan/dep (${this.indexFrametitan++}).png`;
                 this.titan.setAttribute("src", `${pos}`);
             } else if (this.name == nameTitan[1]) {
                 if (((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 400)) || ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -400))) {
-                    pos = `./aot model/depTitan/cuirasseRun${this.indexFrametitan++}.png`;
                     let pre = document.getElementById(`${this.id}`);
                     pre.style.height = "400px";
                     pre.style.bottom = "-30px";
                     pre.style.width = "10%";
+                    pos = `./aot model/depTitan/cuirasseRun${this.indexFrametitan++}.png`;
                     actif = true;
                 } else {
-                    pos = `./aot model/depTitan/cuirasse${this.indexFrametitan++}.png`;
                     let pre = document.getElementById(`${this.id}`);
                     pre.style.height = "280px";
                     pre.style.bottom = "55px";
                     pre.style.width = "5%";
+                    pos = `./aot model/depTitan/cuirasse${this.indexFrametitan++}.png`;
                 }
                 this.titan.setAttribute("src", `${pos}`);
             }
@@ -402,7 +447,7 @@ creationtitan();
 //}
 //FIN DE JEU
 
-document.addEventListener("keydown", async (event) => {
+document.addEventListener("keydown", async(event) => {
     if ((life > 0) && (heure > 0) && (titans.length != 0)) {
         keysPressed[event.key] = true;
         handleKeyPress();
@@ -448,9 +493,9 @@ var authoattack = true
 const attack = () => {
     if (authoattack) {
         authoattack = false
-        // setTimeout(() => {
+            // setTimeout(() => {
         authoattack = true
-        // }, 200);
+            // }, 200);
         var air = document.createElement("audio")
         air.src = "./SF-epee-15.mp3";
         air.volume = 0.2;
@@ -501,7 +546,7 @@ function animateJump() {
         }
     }
     jumpAndScroll()
-    // settime = setTimeout(() => {
+        // settime = setTimeout(() => {
     if (miniJump != 0) {
         timeJump = requestAnimationFrame(animateJump)
     }
@@ -553,7 +598,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 //deplacement innerhtml et scroll left and right
-const moveAndScroll = async () => {
+const moveAndScroll = async() => {
     let perso = document.querySelector(".main");
     perso.style.left = `${deplacement}px`; //changer la position du personnage par rapport a la gauche de l'element parent
     if (deplacement >= 50) { //deplacement: position actuel du personnage, si il est > 50 scroll de 500 NB:j'ai tiré des nombres au hasard
@@ -587,7 +632,7 @@ const blood = () => {
     }
 }
 
-const renderImage = async () => {
+const renderImage = async() => {
     // Éviter de dépasser l'index de la taille du tableau d'images
     if (indexFramedep === imageDeplacement.length) {
         indexFramedep = 0;
@@ -616,9 +661,9 @@ const renderImage = async () => {
                     let hp = document.getElementById("health" + titan.id);
                     hp.style.width = titan.lifetitan + "%";
                     if (titan.lifetitan <= 0) {
-                        if (titan.name == nameTitan[0]){
+                        if (titan.name == nameTitan[0]) {
                             point += 10;
-                        }else if (titan.name == nameTitan[1]){
+                        } else if (titan.name == nameTitan[1]) {
                             point += 15;
                         }
                         let pointdiv = document.getElementById("point")
