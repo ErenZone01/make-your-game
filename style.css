@@ -5,11 +5,20 @@ body {
     width: min-content;
     height: 500px;
     position: relative;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
     background-color: black;
     overflow-x: hidden;
+}
+
+.ombre {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Couleur noire semi-transparente */
+    display: block;
+    z-index: 1;
 }
 
 .background {
@@ -40,14 +49,15 @@ body {
     overflow: hidden;
 }
 
-.points{
+.points {
     position: fixed;
     left: 0px;
-    top : 40px;
+    top: 40px;
     font-weight: bolder;
     color: white;
 }
-.point{
+
+.point {
     font-size: 160%;
 }
 
@@ -60,6 +70,60 @@ body {
     border-style: solid;
     /* border-radius: 10%; */
     overflow: hidden;
+}
+
+.block {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    background-image: url("./begin/Attack\ On\ Titan\ \(anime\).jpg");
+    background-size: cover;
+    width: 44%;
+    height: 60%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    z-index: 2;
+}
+
+.block2 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    background-image: url("./begin/start.jpg");
+    background-repeat: repeat;
+    background-size: contain;
+    width: 44%;
+    height: 60%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    z-index: 2;
+    visibility: hidden;
+}
+
+.start {
+    font-size: 250%;
+    border-radius: 20px;
+    padding: 10px;
+    font-weight: bolder;
+    transform: rotate(180deg);
+}
+
+.continue {
+    font-size: 250%;
+    border-radius: 20px;
+    padding: 10px;
+    font-weight: bolder;
+    transform: rotate(180deg);
+    margin-left: 40px;
+    margin-right: 40px;
 }
 
 .hp {
@@ -95,7 +159,7 @@ body {
     font-size: 180%;
     color: black;
     padding: 10px;
-    border-style:groove;
+    border-style: groove;
     border-color: white;
 }
 

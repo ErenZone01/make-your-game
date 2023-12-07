@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Make Your Game</title>
     <link rel="stylesheet" href="./style.css">
+
 </head>
 
 <body>
+    <div class="ombre"></div>
     <img src="./asset/shiganshina.png" alt="main" class="background">
     <span class="hp">HP : </span>
     <div class="healthbarre">
@@ -20,6 +22,20 @@
     <div id="timer">
         <div class="time">Timer: <span id="heure">???</span>
         </div>
+        <div>
+            <button onclick="PauseGame()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg> Pause</button>
+        </div>
+    </div>
+    <div class="block">
+        <button class="start" onclick="StartGame()">Start</button>
+    </div>
+    <div class="block2">
+        <button class="continue" onclick="ContinueGame()">Continue</button>
+        <button class="continue" onclick="RestartGame()">Restart</button>
     </div>
     <script src="./script.js"></script>
     <img src="./per0.png" alt="main" class="main">
