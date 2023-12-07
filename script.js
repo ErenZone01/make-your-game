@@ -704,6 +704,10 @@ const moveAndScroll = async() => {
     perso.style.left = `${deplacement}px`; //changer la position du personnage par rapport a la gauche de l'element parent
     if (deplacement >= 50) { //deplacement: position actuel du personnage, si il est > 50 scroll de 500 NB:j'ai tiré des nombres au hasard
         window.scrollTo(deplacement - 500, 0)
+        if (pause) {
+            let block2 = document.getElementsByClassName("block2");
+            block2.style = " top: 50%; left: 50%; transform: translate(-50 % , -50 % ) rotate(180 deg);"
+        }
     }
     // 
 }
