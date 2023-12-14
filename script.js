@@ -1,15 +1,15 @@
-var deplacement = 1;
-var life = 100;
-var degat = 2;
-var point = 0
-var animation;
-var timer;
-var settime;
-var direction;
 var fond = document.querySelector(".background");
 var imageDeplacement = ["dep0.png", "dep1.png", "dep2.png"];
 var imageHit = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png", "hit06.png"];
 var mainImage = document.querySelector(".main");
+var deplacement = 1;
+var life = 100;
+var degat = 2;
+var point = 0;
+var animation;
+var timer;
+var settime;
+var direction;
 var indexFramedep = 0;
 var indexFramedeptitan = 0;
 var miniJump = 0;
@@ -52,6 +52,42 @@ let pointdiv = document.getElementById("point")
 pointdiv.textContent = point;
 //pause
 var pause = false
+const initGame = () => {
+    deplacement = 1;
+    life = 100;
+    degat = 2;
+    point = 0;
+    animation;
+    timer;
+    settime;
+    direction;
+    indexFramedep = 0;
+    indexFramedeptitan = 0;
+    miniJump = 0;
+    actif = true;
+    timerJump;
+    timeJump;
+    authoJump = true
+    test;
+    dep = false;
+    keysPressed = {};
+    ImageTitan = 8;
+    end;
+    //blood
+    indexblood = 1;
+    animateblood;
+    timeblood;
+    //nbr titan
+    numberOfTitans = 4;
+    const titans = [];
+    createTitantimer = null;
+    //Creer un timer
+    duration = null;
+    heure = 120;
+    backgroundsound;
+    saut = null;
+    pause = false
+}
 
 const BackgroundSound = () => {
     backgroundsound = document.createElement("audio")
@@ -60,26 +96,36 @@ const BackgroundSound = () => {
     backgroundsound.play();
 }
 
-const Endgame = async() => {
+const endanimation = async () => {
+    for (let i = 0; i < titans.length; i++) {
+        clearTimeout(await titans[i].timeAnimateTitan);
+        clearTimeout(await titans[i].timehit);
+        clearTimeout(timerJump);
+        clearTimeout(duration);
+        clearTimeout(timer);
+        clearTimeout(test);
+        clearTimeout(settime);
+        cancelAnimationFrame(timeJump);
+        cancelAnimationFrame(animation);
+        cancelAnimationFrame(await titans[i].animatehit);
+        cancelAnimationFrame(await titans[i].animateTitan);
+        cancelAnimationFrame(end);
+    }
+}
+
+const Endgame = async () => {
     if (((life <= 0) || (heure <= 0)) || ((heure < 110) && (titans.length == 0))) {
-        for (let i = 0; i < titans.length; i++) {
-            clearTimeout(await titans[i].timeAnimateTitan);
-            clearTimeout(await titans[i].timehit);
-            clearTimeout(timerJump);
-            clearTimeout(duration);
-            clearTimeout(timer);
-            clearTimeout(test);
-            clearTimeout(settime);
-            cancelAnimationFrame(timeJump);
-            cancelAnimationFrame(animation);
-            cancelAnimationFrame(await titans[i].animatehit);
-            cancelAnimationFrame(await titans[i].animateTitan);
-            cancelAnimationFrame(end);
-        }
+        await endanimation();
         if ((heure < 110) && (titans.length == 0)) {
-            alert("Vous avez Gagner");
+            let win = document.getElementsByClassName("block3")[0];
+            win.style.visibility = "visible";
         } else {
-            alert("Vous avez Perdu");
+            let mainImage = document.getElementsByClassName("main")[0];
+            mainImage.src = "./die.png"
+            setTimeout(() => {
+                let lose = document.getElementsByClassName("block4")[0];
+                lose.style.visibility = "visible";
+            }, 2000);
         }
 
     } else {
@@ -106,47 +152,46 @@ const GameDuration = () => {
 
 }
 
-
 class Titan {
     constructor(id, name) {
-            this.id = id;
-            this.deplacementTitan = fond.clientWidth - 200;
-            this.lifetitan = 100;
-            this.degatTitan = 1;
-            this.indexFrametitan = 1;
-            this.indexFramehit = 1;
-            this.animateTitan = null;
-            this.hpbarre = null;
-            this.hp = null;
-            this.tailles = null;
-            this.animatehit = null;
-            this.timehit = null;
-            this.timeAnimateTitan = null;
-            this.name = name
-            this.indexflash = 1;
-            this.timeflash = null;
-            this.animateflash = null;
-            this.height = null;
-            this.animationtitan = 450;
-            this.position = "";
-            //poussiere
-            this.indexpoussiere = 1;
-            this.animatepoussiere = null;
-            this.timepoussiere = null;
-            //impact
-            this.indeximpact = 1;
-            this.animateimpactframe = null;
-            this.timeimpact = null;
-            //les methodes
-            this.createTitan();
-            this.flash();
-            this.createHPBar();
-            this.createimpact();
-            this.createpoussiere();
-            this.renderTitan();
+        this.id = id;
+        this.deplacementTitan = fond.clientWidth - 200;
+        this.lifetitan = 100;
+        this.degatTitan = 1;
+        this.indexFrametitan = 1;
+        this.indexFramehit = 1;
+        this.animateTitan = null;
+        this.hpbarre = null;
+        this.hp = null;
+        this.tailles = null;
+        this.animatehit = null;
+        this.timehit = null;
+        this.timeAnimateTitan = null;
+        this.name = name
+        this.indexflash = 1;
+        this.timeflash = null;
+        this.animateflash = null;
+        this.height = null;
+        this.animationtitan = 450;
+        this.position = "";
+        //poussiere
+        this.indexpoussiere = 1;
+        this.animatepoussiere = null;
+        this.timepoussiere = null;
+        //impact
+        this.indeximpact = 1;
+        this.animateimpactframe = null;
+        this.timeimpact = null;
+        //les methodes
+        this.createTitan();
+        this.flash();
+        this.createHPBar();
+        this.createimpact();
+        this.createpoussiere();
+        this.renderTitan();
 
-        }
-        //apparition titan
+    }
+    //apparition titan
     flash = () => {
         if (!pause) {
             if (this.indexflash == 1) {
@@ -199,7 +244,7 @@ class Titan {
             this.titan.style.position = "absolute";
             this.titan.style.right = `0px`;
             this.titan.id = this.id;
-            this.titan.classList = "titan";
+            this.titan.classKList = "titan";
             document.body.append(this.titan);
             let test = document.getElementById(this.id);
             let info = test.getBoundingClientRect();
@@ -289,7 +334,7 @@ class Titan {
                 // Logique après l'animation d'attaque du titan
                 // ...
                 //bruit de frappe sur le sol
-                var hit = document.createElement("audio")
+                let hit = document.createElement("audio")
                 hit.src = "./rock.mp3";
                 hit.currentTime = 2;
                 hit.volume = 0.5;
@@ -299,7 +344,7 @@ class Titan {
 
                 if (((this.deplacementTitan - deplacement >= 0) && (this.deplacementTitan - deplacement <= 50)) || ((this.deplacementTitan - deplacement < 0) && (this.deplacementTitan - deplacement >= -50))) {
                     life -= this.degatTitan
-                    var hpmain = document.getElementById("health");
+                    let hpmain = document.getElementById("health");
                     hpmain.style.width = life + "%";
                     if (life == 50) {
                         hpmain.style.backgroundColor = "orange";
@@ -308,7 +353,9 @@ class Titan {
                     }
                     mainImage = document.querySelector(".main");
                     mainImage.style.bottom = "45px"
-                        //mainImage.src = "./asset/die.png"
+                    if (life <= 0) {
+                        Endgame();
+                    }
                 }
                 this.indexFramehit = 1;
                 clearTimeout(this.timehit);
@@ -503,7 +550,7 @@ const StartGame = () => {
     overlay.style.display = "none"
 
 }
-const RestartGame = async() => {
+const RestartGame = async () => {
     window.location.reload();
 }
 const ContinueGame = () => {
@@ -524,7 +571,7 @@ const PauseGame = () => {
 //}
 //FIN DE JEU
 
-document.addEventListener("keydown", async(event) => { //boutton de direction
+document.addEventListener("keydown", async (event) => { //boutton de direction
     if ((life > 0) && (heure > 0) && (titans.length != 0) && (!pause)) {
         keysPressed[event.key] = true;
         handleKeyPress();
@@ -532,7 +579,7 @@ document.addEventListener("keydown", async(event) => { //boutton de direction
 });
 
 
-document.addEventListener("keydown", async(event) => { //continue
+document.addEventListener("keydown", async (event) => { //continue
     if (event.key == "C" || event.key == "c") {
         for (let i = 0; i < titans.length; i++) {
             titans[i].renderTitan();
@@ -582,9 +629,9 @@ const attack = () => {
 
         if (authoattack) {
             authoattack = false
-                // setTimeout(() => {
+            // setTimeout(() => {
             authoattack = true
-                // }, 200);
+            // }, 200);
             var air = document.createElement("audio")
             air.src = "./SF-epee-15.mp3";
             air.volume = 0.2;
@@ -640,7 +687,7 @@ function animateJump() {
             }
         }
         jumpAndScroll()
-            // settime = setTimeout(() => {
+        // settime = setTimeout(() => {
         if (miniJump != 0) {
             timeJump = requestAnimationFrame(animateJump)
         }
@@ -699,7 +746,7 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 //deplacement innerhtml et scroll left and right
-const moveAndScroll = async() => {
+const moveAndScroll = async () => {
     let perso = document.querySelector(".main");
     perso.style.left = `${deplacement}px`; //changer la position du personnage par rapport a la gauche de l'element parent
     if (deplacement >= 50) { //deplacement: position actuel du personnage, si il est > 50 scroll de 500 NB:j'ai tiré des nombres au hasard
@@ -741,7 +788,7 @@ const blood = () => {
     }
 }
 
-const renderImage = async() => {
+const renderImage = async () => {
     if (!pause) {
         // Éviter de dépasser l'index de la taille du tableau d'images
         if (indexFramedep === imageDeplacement.length) {

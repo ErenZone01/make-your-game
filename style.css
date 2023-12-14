@@ -90,14 +90,11 @@ body {
     z-index: 2;
 }
 
-.block2 {
+.block2, .block3, .block4{
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-image: url("./begin/pause.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
     width: 60%;
     height: 60%;
     text-align: center;
@@ -107,6 +104,23 @@ body {
     border-radius: 10px;
     z-index: 2;
     visibility: hidden;
+}
+.block2{
+    background-image: url("./begin/pause.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.block3{
+    background-image: url("./begin/4.trophy.gif");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.block4{
+    background-image: url("./begin/gifs-de-game-over-0.gif");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .start {
