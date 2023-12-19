@@ -4,7 +4,7 @@ var imageHit = ["hit01.png", "hit02.png", "hit03.png", "hit04.png", "hit05.png",
 var mainImage = document.querySelector(".main");
 var deplacement = 1;
 var life = 100;
-var degat = 2;
+var degat = 10;
 var point = 0;
 var animation;
 var timer;
@@ -157,7 +157,7 @@ class Titan {
         this.id = id;
         this.deplacementTitan = fond.clientWidth - 200;
         this.lifetitan = 100;
-        this.degatTitan = 1;
+        this.degatTitan = 10;
         this.indexFrametitan = 1;
         this.indexFramehit = 1;
         this.animateTitan = null;
@@ -229,7 +229,6 @@ class Titan {
             requestAnimationFrame(() => { this.flash() });
         }
     }
-
     createTitan() {
         if (!pause) {
             this.titan = document.createElement("img");
@@ -254,7 +253,6 @@ class Titan {
             requestAnimationFrame(() => { this.createTitan() })
         }
     }
-
     createHPBar() {
         if (!pause) {
             this.hpbarre = document.createElement("div");
@@ -270,7 +268,6 @@ class Titan {
             requestAnimationFrame(() => { this.createHPBar() })
         }
     }
-
     createpoussiere() {
         //creation poussiere
         if (!pause) {
@@ -303,7 +300,6 @@ class Titan {
             requestAnimationFrame(() => { this.createimpact() })
         }
     }
-
     hitTitan() {
         if (!pause) {
             this.animationtitan = 450;
@@ -367,7 +363,6 @@ class Titan {
         }
 
     }
-
     animatepoussierefunc() {
         if (!pause) {
             let poussiere = document.getElementById(`poussiere${this.id}`);
@@ -390,7 +385,6 @@ class Titan {
             requestAnimationFrame(() => { this.animatepoussierefunc(); })
         }
     }
-
     animateimpact() {
         if (!pause) {
             let impact = document.getElementById(`impact${this.id}`);
@@ -416,7 +410,6 @@ class Titan {
             requestAnimationFrame(() => { this.animateimpact(); })
         }
     }
-
     renderTitan() {
         if (!pause) {
             if (this.lifetitan > 0) {
@@ -578,6 +571,16 @@ document.addEventListener("keydown", async (event) => { //boutton de direction
     }
 });
 
+document.addEventListener("keyup", async (event) => { //boutton de direction
+    if ((life > 0) && (heure > 0) && (titans.length != 0) && (!pause)) {
+        keysPressed[event.key] = true;
+        if (keysPressed[" "]) {
+            // Gérer l'action pour la barre d'espace
+            attack();
+        }
+    }
+});
+
 
 document.addEventListener("keydown", async (event) => { //continue
     if (event.key == "C" || event.key == "c") {
@@ -592,7 +595,6 @@ document.addEventListener("keyup", (event) => {
     keysPressed[event.key] = false;
     handleKeyPress();
 });
-
 
 function handleKeyPress() {
     if (keysPressed["ArrowDown"]) {
@@ -614,11 +616,6 @@ function handleKeyPress() {
         eventJump();
     }
 
-    if (keysPressed[" "]) {
-        // Gérer l'action pour la barre d'espace
-
-        attack();
-    }
     setTimeout(() => {
         requestAnimationFrame(handleKeyPress)
     }, 2000);
